@@ -1,0 +1,102 @@
+# Shopping Cart System (Replit-friendly CLI version)
+
+import json
+
+# Load product data
+def load_products():
+    return [
+        {"id": 1, "name": "Laptop", "price": 50000},
+        {"id": 2, "name": "Headphones", "price": 1500},
+        {"id": 3, "name": "Mouse", "price": 700},
+        {"id": 4, "name": "Keyboard", "price": 1200},
+        {"id": 5, "name": "USB Cable", "price": 300}
+    ]
+
+# Cart logic
+class Cart:
+    def __init__(self):
+        self.items = []
+
+    def add_item(self, product, quantity):
+        for item in self.items:
+            if item['product']['id'] == product['id']:
+                item['quantity'] += quantity
+                return
+        self.items.append({'product': product, 'quantity': quantity})
+
+    def get_total(self):
+        return sum(item['product']['price'] * item['quantity'] for item in self.items)
+
+    def clear(self):
+        self.items = []
+
+    def view_cart(self):
+        if not self.items:
+            print("\nYour cart is empty.")
+            return
+        print("\nYour Cart:")
+        for item in self.items:
+            p = item['product']
+            print(f"- {p['name']} x{item['quantity']} - ₹{p['price']} each")
+        print(f"Total: ₹{self.get_total()}")
+
+# CLI Interface
+
+def show_menu():
+    print("\n=== Shopping Cart Menu ===")
+    print("1. View Products")
+    print("2. Add to Cart")
+    print("3. View Cart")
+    print("4. Checkout")
+    print("5. Exit")
+
+
+def main():
+    products = load_products()
+    cart = Cart()
+
+    while True:
+        show_menu()
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            print("\nAvailable Products:")
+            for p in products:
+                print(f"{p['id']}. {p['name']} - ₹{p['price']}")
+
+        elif choice == '2':
+            try:
+                pid = int(input("Enter product ID to add: "))
+                qty = int(input("Enter quantity: "))
+                product = next((p for p in products if p['id'] == pid), None)
+                if product and qty > 0:
+                    cart.add_item(product, qty)
+                    print("Item added to cart.")
+                else:
+                    print("Invalid product ID or quantity.")
+            except ValueError:
+                print("Please enter valid numeric inputs.")
+
+        elif choice == '3':
+            cart.view_cart()
+
+        elif choice == '4':
+            cart.view_cart()
+            if cart.get_total() > 0:
+                confirm = input("Proceed to checkout? (y/n): ").lower()
+                if confirm == 'y':
+                    print("\nThank you for your purchase!")
+                    cart.clear()
+            else:
+                print("Your cart is empty.")
+
+        elif choice == '5':
+            print("Goodbye!")
+            break
+
+        else:
+            print("Invalid choice. Please select from the menu.")
+
+
+if __name__ == '__main__':
+    main()
